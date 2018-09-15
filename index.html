@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Word Game</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <style>
+        #word, #letters {
+            letter-spacing: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Word Guess Game</h1>
+    </header>
+
+    <main>
+        <span id="instr">Press <span id="keyToStart"></span> key to get started!</span>
+        <!-- <summary> -->
+            <br>Wins: <span id="wins"></span>
+        <!-- </summary>
+        <section> -->
+            <br>Word:
+            <br><span id="word" class="ml-3"></span>
+            <br>Guesses Remaining: <span id="guesses"></span>
+            <br>Letters Guessed: <span id="letters"></span>
+            <br><span id="help"></span>
+        <!-- </section> -->
+    </main>
+
+    <!-- <button>Category 1</button>
+    <button>Category 2</button>
+    <button>Category 3</button>
+    <button>Category 4</button>
+    <button>random!</button>
+    <button>BIG JUMBLE</button> -->
+
+    <!-- ideas:
+    - toggle letters guessed display 
+    --  with green/red/white status
+    - css shapes for progress
+    - big db of categories - answers
+    - image search with goggle -->
+    <!--TODOS
+        change window title with category
+    -->
+
+    <script src="./assets/javascript/game.js"></script>
+</body>
+
+</html>
