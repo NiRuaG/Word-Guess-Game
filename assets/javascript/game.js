@@ -1,18 +1,17 @@
 'use strict';
 
 // CONSTANTS
+
 // NB: WORD_BANK words should be all caps, though there is a later safety toUpperCase() call
+// At this point..
+//   Hyphens will be removed from the words by the code. They are left in this array incase of future versions & options
+//   Diacritics have been removed from this array, and would need editing to restore them. 
 const WORD_BANK = [
-    "RANDOMA",
-    "RANDOMB",
-    "RANDOMC",
-    "RANDOMD",
-    "RANDOME",
-    "RANDOMF"
+    "FELLOWSHIP", "MORDOR", "HOBBIT", "DWARF", "WIZARD", "ELVES", "WRAITHS", "RIDERS", "TROLL", "BALROGS", "SAURON", "BOROMIR", "SARUMAN", "ISENGARD", "ARAGORN", "LEGOLAS", "GIMLI", "ROHAN", "GANDALF", "TREEBEARD", "MERRY", "PIPPIN", "FRODO", "BAGGINS", "SAMWISE", "GOLLUM", "ELROND", "RIVENDELL", "ARWEN", "LOTHLORIEN", "PEREGRIN", "GLAMDRING", "STING", "GONDOLIN", "MORIA", "DWARROWDELF", "MIRKWOOD", "GONDOR", "SHIRE", "NAZGUL ", "RADAGAST", "ANDUIN", "GOBLIN", "SPIDER", "ORCRIST", "EOWYN", "FARAMIR", "GALADRIEL", "FOE-HAMMER", "KHAZAD-DUM",
 ];
 
-const KEY_TO_START = "Enter";
-const KEY_NEW_GAME = "Enter";
+// const KEY_TO_START = "Enter";
+// const KEY_NEW_GAME = "Enter";
 const HIDE_CHAR = '_';
 
 const MAX_GUESSES = 14;
@@ -39,6 +38,7 @@ const GAME_RESET = {
 // GLOBALS
 let gameVars = {
     wins: 0,
+    sessionStarted: false,
 };
 
 // Global - Store DOM elements that get regularly altered
@@ -71,11 +71,11 @@ window.onload = function () {
         + " key to get started!");  
 };
 
-function updateElements(...args) {
+let updateElements = (...args) => {
     args.forEach( (id) => {
         id.el.textContent = gameVars[id.gVar];
     });
-}
+};
 
 function startNewGame() {
     console.log("--- STARTING NEW GAME ---");
@@ -87,14 +87,14 @@ function startNewGame() {
     // New random word
     gameVars.wordAnswer = WORD_BANK[
         Math.floor(Math.random() * WORD_BANK.length)
-    ].toUpperCase(); // word bank should already be ALL-CAPS, but just in case
+    ].replace('-','') // removing hyphens, 
+    .toUpperCase(); // word bank should already be ALL-CAPS, but just in case
         
     console.log("cheat: " + gameVars.wordAnswer);
         
     // display word as "hidden" string
     gameVars.wordProgress = HIDE_CHAR.repeat(gameVars.wordAnswer.length);
 
-    showHelp("");
     showInstr("Press letter keys to guess the word.");
     ////
 
@@ -129,6 +129,7 @@ function checkLetter(letter) {
             }
             showHelp(msg);
         } else { // letter is in the word 
+            showHelp("");
             for (let i = 0; i < g .wordAnswer .length; ++i) {
                 if (g.wordAnswer [i] === letter) {
                     g.wordProgress =
@@ -140,7 +141,7 @@ function checkLetter(letter) {
             }
 
             // Check if completed 
-            if (g.wordProgress === g.wordAnswer ) {
+            if (g.wordProgress === g.wordAnswer) {
                 showHelp("You guessed the word!");
                 scoreWin();
                 g.endOfGame = true;
@@ -152,22 +153,23 @@ function checkLetter(letter) {
                 + ((typeof KEY_NEW_GAME === "string") ?
                     "[" + KEY_NEW_GAME + "]"
                     : "any")
-                + " to start a new game!")
+                + " key to start a new game!")
         }
     })(gameVars);
 }
 
-const once = function(f) {
-    return () => {
-        if (!f) { return; }
-        f();
-        f = null;
-    };
-}
+// const once = function(f) {
+//     return () => {
+//         if (!f) { return; }
+//         f();
+//         f = null;
+//     };
+// }
 
 function startGameSession() {
     console.log("--- STARTING SESSION ---");
 
+    gameVars.sessionStarted = true;
     // document.getElementById("instr" ).style.visibility = "hidden";
     document.getElementById("gameUI").style.visibility = "visible";
     
@@ -175,40 +177,43 @@ function startGameSession() {
     updateElements(DOM_IDs.wins); 
 }
 
-let eventsByKey = {
-    KEY_TO_START: once(startGameSession),
-    KEY_NEW_GAME: startNewGame          ,
-};
+// let eventsByKey = {
+//     // KEY_TO_START: once(startGameSession),
+//     // KEY_NEW_GAME: startNewGame          ,
+// };
 
 document.onkeyup = function (event) {
     let key = event.key;
-    // console.log(key);
+    console.log(key);
 
-    if (key === KEY_TO_START) {
-        eventsByKey.KEY_TO_START();
+    if (!gameVars.sessionStarted) {
+        // once(startGameSession);
+        startGameSession();
     }
-    if (gameVars.endOfGame && key === KEY_NEW_GAME) {
-        eventsByKey.KEY_NEW_GAME();
+    else if (gameVars.endOfGame) {
+        startNewGame();
     }
-    else if (eventsByKey.hasOwnProperty(key)) {
-        eventsByKey[key]();
-    }
-    else if (!gameVars.endOfGame) {
-        key = key.toUpperCase();
+    else {
+        // if (eventsByKey.hasOwnProperty(key)) {
+        //     eventsByKey[key]();
+        // } else 
+        if (!gameVars.endOfGame) {
+            key = key.toUpperCase();
 
-        if (key.length === 1 && key >= 'A' && key <= 'Z') {
-            if (gameVars.lettersGuessed_Obj[key]) {
-                showHelp("Letter " + key + " has already been guessed!");
-                /// TODO: css highlight 
+            if (key.length === 1 && key >= 'A' && key <= 'Z') {
+                if (gameVars.lettersGuessed_Obj[key]) {
+                    showHelp("Letter " + key + " has already been guessed!");
+                    /// TODO: css highlight 
+                }
+                else { // New letter guessed
+                    gameVars.guessesRemaining--;
+                    gameVars.lettersGuessed_Obj[key] = true;
+                    gameVars.lettersGuessed_Str += key;
+
+                    checkLetter(key);
+                }
+                updateElements(DOM_IDs.guessCount, DOM_IDs.letters, DOM_IDs.word);
             }
-            else { // New letter guessed
-                gameVars.guessesRemaining--;
-                gameVars.lettersGuessed_Obj[key] = true;
-                gameVars.lettersGuessed_Str += key;
-
-                checkLetter(key);
-            }
-            updateElements(DOM_IDs.guessCount, DOM_IDs.letters, DOM_IDs.word);
         }
     }
 };

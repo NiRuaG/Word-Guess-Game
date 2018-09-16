@@ -21,16 +21,15 @@
 <body>
     <header>
         <h1>Word Guess Game</h1>
+        <h2 class="mx-5">Lord of the Rings</h2>
     </header>
 
     <main class="container">
-        <div class="row">
-            <span id="instr"></span>
-        </div>
-        <div class="row">
-            <div class="col" id="gameUI" style="visibility: hidden">
-                <!-- <summary> -->
-                <br>Wins: <span id="wins"></span>
+        <span id="instr" class="row my-2"></span>
+    
+        <div class="row" id="gameUI" style="visibility: hidden">
+            <div class="col">
+                Wins: <span id="wins"></span>
                 <br>
                 <br>Word:
                 <br><span id="word" class="ml-3"></span>
@@ -39,10 +38,17 @@
                 <br>Guesses Remaining: <span id="guessCount"></span> /<span id="maxGuesses"></span>
                 <br>
                 <br><span id="help"></span>
-                <!-- </section> -->
-                <br>
             </div>
-        </div>
+            <!-- <div class="row"> -->
+            <div class="col">
+                <h5>Notes:</h5>
+                <ol>
+                    <li>Possible words include proper names and places.</li>
+                    <li>If it is a <em>hyphenated-word</em>, hyphens will not be shown.</li>
+                    <li>Diacritics (letter accents) are ignored - are not required for guessing, and will not be shown.</li>
+                </ol>
+            </div>
+            <br>
         </div>
     </main>
 
@@ -61,6 +67,7 @@
     - image search with goggle 
     - updateElements to have variable arguments
     - progress bar for guesses remaining
+    - difficulty settings?  length of words
 -->
     <!--TODOS
         - change window title with category
