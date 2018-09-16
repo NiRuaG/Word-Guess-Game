@@ -1,7 +1,7 @@
 'use strict';
 
 // CONSTANTS
-// NB: WORD_BANK words should be all caps, though there is a safety toUpperCase() call
+// NB: WORD_BANK words should be all caps, though there is a later safety toUpperCase() call
 const WORD_BANK = [
     "RANDOMA",
     "RANDOMB",
@@ -12,11 +12,12 @@ const WORD_BANK = [
 ];
 
 const KEY_TO_START = "Enter";
+const KEY_NEW_GAME = "Enter";
 const HIDE_CHAR = '_';
 
-const MAX_GUESSES = 8;
+const MAX_GUESSES = 14;
 const GAME_RESET = {
-    guessesRemaining  : MAX_GUESSES,
+    guessesRemaining: MAX_GUESSES,
 
     lettersGuessed_Str: "",
     lettersGuessed_Obj: {
@@ -29,10 +30,10 @@ const GAME_RESET = {
         Y: false, Z: false
     },
 
-    wordAnswer  : ""   ,
-    wordProgress: ""   ,
+    wordAnswer  : "",
+    wordProgress: "",
 
-    endOfGame   : false,
+    endOfGame: false,
 }
 
 // GLOBALS
@@ -40,34 +41,34 @@ let gameVars = {
     wins: 0,
 };
 
-// Global - Store DOM elements
-// !! Important that property keys are the same name as the HTML id=".."
+// Global - Store DOM elements that get regularly altered
+// !! Important that object's keys are the same name as the HTML id=".."
 let DOM_IDs = {
     word      : { el: null, gVar: "wordProgress"       },
     guessCount: { el: null, gVar: "guessesRemaining"   },
     letters   : { el: null, gVar: "lettersGuessed_Str" },
     wins      : { el: null, gVar: "wins"               },
-    help      : { el: null                             },
+    help      : { el: null },
+    instr     : { el: null },
 };
-
 
 // FUNCTIONS
 window.onload = function () {
     console.log("--- ON LOAD ---");
 
     // One-off DOM elements
-    document.getElementById("instr").textContent = "Press " +
-        ((typeof KEY_TO_START === "string") ?
-            "[" + KEY_TO_START + "]"
-            : "any")
-        + " key to get started!";
-
     document.getElementById("maxGuesses").textContent = MAX_GUESSES;
     
     // Link up the variables to their DOM elements 
     Object.entries(DOM_IDs).forEach( ([k,v]) => {
         v.el = document.getElementById(k);
     });
+
+    showInstr("Press " 
+        + ((typeof KEY_TO_START === "string") ?
+            "[" + KEY_TO_START + "]"
+            : "any")
+        + " key to get started!");  
 };
 
 function updateElements(...args) {
@@ -94,16 +95,22 @@ function startNewGame() {
     gameVars.wordProgress = HIDE_CHAR.repeat(gameVars.wordAnswer.length);
 
     showHelp("");
+    showInstr("Press letter keys to guess the word.");
     ////
 
     updateElements(
         DOM_IDs.word      , 
         DOM_IDs.guessCount, 
-        DOM_IDs.letters   ,);
+        DOM_IDs.letters   ,
+    );
 }
 
 function showHelp(msg) {
     DOM_IDs.help.el.textContent = msg;
+}
+
+function showInstr(msg) {
+    DOM_IDs.instr.el.textContent = msg;
 }
 
 function scoreWin() {
@@ -117,7 +124,7 @@ function checkLetter(letter) {
             let msg = letter + " is NOT in the word.";
             // trigger css
             if (g.guessesRemaining === 0) {
-                msg += " You have run out of guesses =[";
+                msg += " You have run out of guesses =[.  The word was " + g.wordAnswer;
                 g.endOfGame = true;
             }
             showHelp(msg);
@@ -139,6 +146,14 @@ function checkLetter(letter) {
                 g.endOfGame = true;
             }
         }
+
+        if (g.endOfGame) {
+            showInstr("Press " 
+                + ((typeof KEY_NEW_GAME === "string") ?
+                    "[" + KEY_NEW_GAME + "]"
+                    : "any")
+                + " to start a new game!")
+        }
     })(gameVars);
 }
 
@@ -153,27 +168,32 @@ const once = function(f) {
 function startGameSession() {
     console.log("--- STARTING SESSION ---");
 
-    document.getElementById("instr" ).style.visibility = "hidden";
+    // document.getElementById("instr" ).style.visibility = "hidden";
     document.getElementById("gameUI").style.visibility = "visible";
-
+    
     startNewGame();
     updateElements(DOM_IDs.wins); 
 }
 
 let eventsByKey = {
-    Enter  : once(startGameSession),
-    Escape : startNewGame          ,
+    KEY_TO_START: once(startGameSession),
+    KEY_NEW_GAME: startNewGame          ,
 };
 
 document.onkeyup = function (event) {
     let key = event.key;
-    console.log(key);
+    // console.log(key);
 
-    if (eventsByKey.hasOwnProperty(key)) {
+    if (key === KEY_TO_START) {
+        eventsByKey.KEY_TO_START();
+    }
+    if (gameVars.endOfGame && key === KEY_NEW_GAME) {
+        eventsByKey.KEY_NEW_GAME();
+    }
+    else if (eventsByKey.hasOwnProperty(key)) {
         eventsByKey[key]();
     }
-
-    if (!gameVars.endOfGame) {
+    else if (!gameVars.endOfGame) {
         key = key.toUpperCase();
 
         if (key.length === 1 && key >= 'A' && key <= 'Z') {
