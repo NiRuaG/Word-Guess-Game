@@ -68,7 +68,9 @@ window.onload = function () {
         + ((typeof KEY_TO_START === "string") ?
             "[" + KEY_TO_START + "]"
             : "any")
-        + " key to get started!");  
+        + " key to get started!");
+    
+    startGameSession();
 };
 
 let updateElements = (...args) => {
@@ -95,6 +97,7 @@ function startNewGame() {
     // display word as "hidden" string
     gameVars.wordProgress = HIDE_CHAR.repeat(gameVars.wordAnswer.length);
 
+    showHelp("");
     showInstr("Press letter keys to guess the word.");
     ////
 
@@ -106,7 +109,13 @@ function startNewGame() {
 }
 
 function showHelp(msg) {
-    DOM_IDs.help.el.textContent = msg;
+    if (msg) {
+        DOM_IDs.help.el.style.visibility = 'visible';
+        DOM_IDs.help.el.textContent = msg;
+    }
+    else {
+        DOM_IDs.help.el.style.visibility = 'hidden';
+    }
 }
 
 function showInstr(msg) {
@@ -120,16 +129,13 @@ function scoreWin() {
 
 function checkLetter(letter) {
     ((g) => { 
+        let msg = "";
         if (g.wordAnswer .indexOf(letter) < 0) {
-            let msg = letter + " is NOT in the word.";
+            msg += letter + " is not in the word.";
             // trigger css
-            if (g.guessesRemaining === 0) {
-                msg += " You have run out of guesses =[.  The word was " + g.wordAnswer;
-                g.endOfGame = true;
-            }
-            showHelp(msg);
         } else { // letter is in the word 
-            showHelp("");
+
+            // Update the word display on screen
             for (let i = 0; i < g .wordAnswer .length; ++i) {
                 if (g.wordAnswer [i] === letter) {
                     g.wordProgress =
@@ -142,11 +148,18 @@ function checkLetter(letter) {
 
             // Check if completed 
             if (g.wordProgress === g.wordAnswer) {
-                showHelp("You guessed the word!");
+                msg += "You guessed the word!";
                 scoreWin();
                 g.endOfGame = true;
             }
         }
+
+        if (!g.endOfGame &&g.guessesRemaining === 0) {
+            msg += " You have run out of guesses =[.  The word was " + g.wordAnswer;
+            g.endOfGame = true;
+        }
+
+        showHelp(msg);
 
         if (g.endOfGame) {
             showInstr("Press " 
