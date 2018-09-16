@@ -14,9 +14,10 @@ const WORD_BANK = [
 const KEY_TO_START = "Enter";
 const HIDE_CHAR = '_';
 
-const MAX_GUESSES = 14;
+const MAX_GUESSES = 8;
 const GAME_RESET = {
     guessesRemaining  : MAX_GUESSES,
+
     lettersGuessed_Str: "",
     lettersGuessed_Obj: {
         A: false, B: false, C: false, D: false,
@@ -27,8 +28,10 @@ const GAME_RESET = {
         U: false, V: false, W: false, X: false,
         Y: false, Z: false
     },
+
     wordAnswer  : ""   ,
     wordProgress: ""   ,
+
     endOfGame   : false,
 }
 
@@ -52,11 +55,14 @@ let DOM_IDs = {
 window.onload = function () {
     console.log("--- ON LOAD ---");
 
+    // One-off DOM elements
     document.getElementById("instr").textContent = "Press " +
         ((typeof KEY_TO_START === "string") ?
             "[" + KEY_TO_START + "]"
             : "any")
         + " key to get started!";
+
+    document.getElementById("maxGuesses").textContent = MAX_GUESSES;
     
     // Link up the variables to their DOM elements 
     Object.entries(DOM_IDs).forEach( ([k,v]) => {
@@ -91,14 +97,13 @@ function startNewGame() {
     ////
 
     updateElements(
-        DOM_IDs.wins      , 
         DOM_IDs.word      , 
         DOM_IDs.guessCount, 
         DOM_IDs.letters   ,);
 }
 
-function showHelp(text){
-    DOM_IDs.help.el.textContent = text;
+function showHelp(msg) {
+    DOM_IDs.help.el.textContent = msg;
 }
 
 function scoreWin() {
@@ -152,11 +157,12 @@ function startGameSession() {
     document.getElementById("gameUI").style.visibility = "visible";
 
     startNewGame();
+    updateElements(DOM_IDs.wins); 
 }
 
 let eventsByKey = {
-    Enter    : once(startGameSession),
-    Escape   : startNewGame          ,
+    Enter  : once(startGameSession),
+    Escape : startNewGame          ,
 };
 
 document.onkeyup = function (event) {
