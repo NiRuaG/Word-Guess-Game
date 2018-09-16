@@ -1,113 +1,163 @@
 'use strict';
 
-const KEY_TO_START = "Escape";
-const MAX_GUESSES = 14;
-const RESET_GUESSES = {
-    a: false, b: false, c: false, d: false,
-    e: false, f: false, g: false, h: false,
-    i: false, j: false, k: false, l: false,
-    m: false, n: false, o: false, p: false,
-    q: false, r: false, s: false, t: false,
-    u: false, v: false, w: false, x: false,
-    y: false, z: false
-};
-
+// CONSTANTS
+// NB: WORD_BANK words should be all caps, though there is a safety toUpperCase() call
 const WORD_BANK = [
-    "randomA",
-    "randomB",
-    "randomC",
-    "randomD",
-    "randomE",
-    "randomF"
+    "RANDOMA",
+    "RANDOMB",
+    "RANDOMC",
+    "RANDOMD",
+    "RANDOME",
+    "RANDOMF"
 ];
 
-let wins = 0;
-let guessesRemaining = MAX_GUESSES;
-let lettersGuessed   = Object.assign({}, RESET_GUESSES); // "shallow" copy
-let lettersGuessed_Str = "";
-let word_answer = "";
-let word_progress = "";
-let betweenGames = false;
+const KEY_TO_START = "Enter";
+const HIDE_CHAR = '_';
 
+const MAX_GUESSES = 14;
+const GAME_RESET = {
+    guessesRemaining  : MAX_GUESSES,
+    lettersGuessed_Str: "",
+    lettersGuessed_Obj: {
+        A: false, B: false, C: false, D: false,
+        E: false, F: false, G: false, H: false,
+        I: false, J: false, K: false, L: false,
+        M: false, N: false, O: false, P: false,
+        Q: false, R: false, S: false, T: false,
+        U: false, V: false, W: false, X: false,
+        Y: false, Z: false
+    },
+    wordAnswer  : ""   ,
+    wordProgress: ""   ,
+    endOfGame   : false,
+}
 
-// Store DOM elements
-let ID_word;
-let ID_Guesses;
-let ID_Letters;
-let ID_Help;
-let ID_Wins;
-
-// let myDOM_EL = {
-//     ID_Word: { id: "word" },
-//     ID_Guesses: { id: "guesses" },
-//     ID_Letters: { id: "letters" },
-//     ID_Help: { id: "help" },
-//     ID_Wins: { id: "wins" },
-// };
-
-window.onload = function () {
-    document.getElementById("keyToStart").textContent =
-        (typeof KEY_TO_START === "string") ?
-            "[" + KEY_TO_START + "]"
-            : "any";
-
-    // link DOM elements
-    // myDOM_EL.forEach(el => {
-    // el.element = document.getElementById(el.id);
-    // });
-    // console.log(myDOM_EL);
-    ID_word    = document.getElementById("word"   );
-    ID_Guesses = document.getElementById("guesses");
-    ID_Letters = document.getElementById("letters");
-    ID_Help    = document.getElementById("help"   );
-    ID_Wins    = document.getElementById("wins"   );
-
-    makeNewWord();
+// GLOBALS
+let gameVars = {
+    wins: 0,
 };
 
-function updateElements() {
-       ID_word.textContent = word_progress     ;
-    ID_Letters.textContent = lettersGuessed_Str;
-    ID_Guesses.textContent = guessesRemaining  ;
+// Global - Store DOM elements
+// !! Important that property keys are the same name as the HTML id=".."
+let DOM_IDs = {
+    word      : { el: null, gVar: "wordProgress"       },
+    guessCount: { el: null, gVar: "guessesRemaining"   },
+    letters   : { el: null, gVar: "lettersGuessed_Str" },
+    wins      : { el: null, gVar: "wins"               },
+    help      : { el: null                             },
+};
+
+
+// FUNCTIONS
+window.onload = function () {
+    console.log("--- ON LOAD ---");
+
+    document.getElementById("instr").textContent = "Press " +
+        ((typeof KEY_TO_START === "string") ?
+            "[" + KEY_TO_START + "]"
+            : "any")
+        + " key to get started!";
+    
+    // Link up the variables to their DOM elements 
+    Object.entries(DOM_IDs).forEach( ([k,v]) => {
+        v.el = document.getElementById(k);
+    });
+};
+
+function updateElements(...args) {
+    args.forEach( (id) => {
+        id.el.textContent = gameVars[id.gVar];
+    });
 }
 
-function makeNewWord() {
-    console.log("--- MAKING NEW WORD ---");
-    var rnd = Math.floor(Math.random()*WORD_BANK.length);
-    console.log("rnd: " + rnd);
-    word_answer = WORD_BANK[rnd];
-    console.log("cheat: " + word_answer);
+function startNewGame() {
+    console.log("--- STARTING NEW GAME ---");
 
-    word_progress = '-'.repeat(word_answer.length);
+    //// Set Game Variables
+    // deep copy the reset object, but keep our own 'live' variables (eg wins)
+    gameVars = Object.assign(gameVars, JSON.parse(JSON.stringify(GAME_RESET))); 
 
-    // Reset values
-    guessesRemaining =   MAX_GUESSES;
-    lettersGuessed   = Object.assign({},RESET_GUESSES);  // copy the 
-    console.log(lettersGuessed);
-    lettersGuessed_Str = "";
-    ID_Help.textContent = "";
-    betweenGames = false;
+    // New random word
+    gameVars.wordAnswer = WORD_BANK[
+        Math.floor(Math.random() * WORD_BANK.length)
+    ].toUpperCase(); // word bank should already be ALL-CAPS, but just in case
+        
+    console.log("cheat: " + gameVars.wordAnswer);
+        
+    // display word as "hidden" string
+    gameVars.wordProgress = HIDE_CHAR.repeat(gameVars.wordAnswer.length);
 
-    updateElements();
+    showHelp("");
+    ////
+
+    updateElements(
+        DOM_IDs.wins      , 
+        DOM_IDs.word      , 
+        DOM_IDs.guessCount, 
+        DOM_IDs.letters   ,);
 }
 
-function clearWord() {
-    console.log("--- CLEARING WORDS ---");
-    ID_word.textContent    = "(cleared)";
-    ID_Letters.textContent = "(cleared)";
-    ID_Guesses.textContent = "(cleared)";
-    // updateElements();
+function showHelp(text){
+    DOM_IDs.help.el.textContent = text;
 }
 
 function scoreWin() {
-    ID_Wins.textContent = ++wins;
+    ++gameVars.wins;
+    updateElements(DOM_IDs.wins);
+}
+
+function checkLetter(letter) {
+    ((g) => { 
+        if (g.wordAnswer .indexOf(letter) < 0) {
+            let msg = letter + " is NOT in the word.";
+            // trigger css
+            if (g.guessesRemaining === 0) {
+                msg += " You have run out of guesses =[";
+                g.endOfGame = true;
+            }
+            showHelp(msg);
+        } else { // letter is in the word 
+            for (let i = 0; i < g .wordAnswer .length; ++i) {
+                if (g.wordAnswer [i] === letter) {
+                    g.wordProgress =
+                        g.wordProgress.substring(0, i)
+                        + letter
+                        + g.wordProgress.substring(i + 1, g.wordProgress.length);
+                    // console.log(i,letter,g.wordProgress)
+                }
+            }
+
+            // Check if completed 
+            if (g.wordProgress === g.wordAnswer ) {
+                showHelp("You guessed the word!");
+                scoreWin();
+                g.endOfGame = true;
+            }
+        }
+    })(gameVars);
+}
+
+const once = function(f) {
+    return () => {
+        if (!f) { return; }
+        f();
+        f = null;
+    };
+}
+
+function startGameSession() {
+    console.log("--- STARTING SESSION ---");
+
+    document.getElementById("instr" ).style.visibility = "hidden";
+    document.getElementById("gameUI").style.visibility = "visible";
+
+    startNewGame();
 }
 
 let eventsByKey = {
-  Escape: makeNewWord,
-  Backspace: clearWord,
+    Enter    : once(startGameSession),
+    Escape   : startNewGame          ,
 };
-
 
 document.onkeyup = function (event) {
     let key = event.key;
@@ -117,43 +167,22 @@ document.onkeyup = function (event) {
         eventsByKey[key]();
     }
 
-    if (!betweenGames) {
-        key = key.toLowerCase();  // allow captial lettes / capslock on
+    if (!gameVars.endOfGame) {
+        key = key.toUpperCase();
 
-        if (key.length === 1 && key >= 'a' && key <= 'z') {
-            if (lettersGuessed[key]) {
-                ID_Help.textContent = "Letter " + key + " has already been guessed!";
+        if (key.length === 1 && key >= 'A' && key <= 'Z') {
+            if (gameVars.lettersGuessed_Obj[key]) {
+                showHelp("Letter " + key + " has already been guessed!");
                 /// TODO: css highlight 
             }
-            else {
-                lettersGuessed[key] = true;
-                lettersGuessed_Str += key;
-                guessesRemaining--;
+            else { // New letter guessed
+                gameVars.guessesRemaining--;
+                gameVars.lettersGuessed_Obj[key] = true;
+                gameVars.lettersGuessed_Str += key;
 
-                if (word_answer.toLowerCase().indexOf(key) < 0) {
-                    ID_Help.textContent = key + " is NOT in the word. ";
-                    // trigger css
-                    if (guessesRemaining === 0){
-                        ID_Help.textContent += " You have run out of guesses =[. ";
-                        betweenGames = true;
-                    }
-                } else { // letter is in the word
-                    for (let i = 0; i < word_answer.length; ++i) {
-                        if (word_answer[i].toLowerCase() === key) {
-                            word_progress = word_progress.substring(0, i) + key + word_progress.substring(i + 1, word_answer.length);
-                            // console.log(i,key,word_progress)
-                        }
-                    }
-
-                    // Check if completed
-                    if (word_progress === word_answer.toLowerCase()) {
-                        ID_Help.textContent = "You guessed the word!";
-                        scoreWin();
-                        betweenGames = true;
-                    }
-                }
+                checkLetter(key);
             }
-            updateElements();
+            updateElements(DOM_IDs.guessCount, DOM_IDs.letters, DOM_IDs.word);
         }
     }
 };
