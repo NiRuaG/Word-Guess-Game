@@ -163,7 +163,8 @@ function checkLetter(letter) {
 
             // Check if completed 
             if (g.wordProgress === g.wordAnswer) {
-                showHelp("alert-success", "You guessed the word!");
+                alertType = "alert-success";
+                msgs.push("You guessed the word!");
                 scoreWin();
                 g.endOfGame = true;
             }
@@ -238,7 +239,7 @@ document.onkeyup = function (event) {
 
             if (key.length === 1 && key >= 'A' && key <= 'Z') {
                 if (gameVars.lettersGuessed_Obj[key]) {
-                    showHelp("alert-warning", "Letter " + key + " has already been guessed!");
+                    showHelp("alert-warning", ["Letter " + key + " has already been guessed!"]);
                     /// TODO: css highlight 
                 }
                 else { // New letter guessed
