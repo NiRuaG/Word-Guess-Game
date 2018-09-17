@@ -9,6 +9,19 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
     <style>
+        @font-face {
+            font-family: 'RingbearerMedium';
+            src: 
+                url('./assets/fonts/RingbearerMedium.eot?#iefix') format('embedded-opentype'), 
+                url('./assets/fonts/RingbearerMedium.woff') format('woff'), 
+                url('./assets/fonts/RingbearerMedium.ttf') format('truetype'), 
+                url('./assets/fonts/RingbearerMedium.svg#RingbearerMedium') format('svg');
+            font-weight: normal;
+            font-style: normal;
+        }
+        .font-special {
+            font-family: 'RingbearerMedium';
+        }
         body {
             min-height: 100vh;
             /* display: flex; */
@@ -38,31 +51,35 @@
 <body>
     <header class="jumbotron text-center">
         <h1>Word Guess Game</h1>
-        <span id="category" class="lead"><em>Lord of the Rings</em> edition</span>
+        <span id="category" class="lead"><em class="font-special">Lord of the Rings</em> edition</span>
     </header>
 
     <main class="container">
-        <span id="instr" class="row mb-2"></span>
+        <span id="instr" class="row mx-auto mb-3"></span>
     
         <div class="row bg-primary p-1" id="gameUI" style="visibility: hidden">
-            <div class="col bg-light p-2">
-                Wins: <span id="wins"></span>
-                <br>
-                <br>Word:
-                <br><span id="word" class="ml-3"></span>
-                <br>Letters Guessed:
-                <br><span id="letters" class="ml-3"></span>
-                <br>Guesses Remaining: <span id="guessCount"></span> /<span id="maxGuesses"></span>
-                <br>
-                <br><span id="help">Help</span>
+            <div class="col bg-light">
+                <p class="row mx-0 mb-3 align-items-center">Wins: <span id="wins" class="ml-2"></span></p>
+                <p class="row m-0">Word:</p>
+                <span id="word" class="row ml-3"></span>
+                <p class="row m-0">Letters Guessed:</p>
+                <ul id="letters" class="row list-unstyled ml-3 mb-0"></ul>
+                <p class="row mx-0">Guesses Remaining: <span id="guessCount" class="ml-2"></span>/<span id="maxGuesses"></span></p>
+                <span id="help" class="row mx-0">Help</span>
             </div>
             <!-- <div class="row"> -->
-            <div class="col">
+            <div class="col text-white">
                 <h5>Notes:</h5>
                 <ol>
-                    <li>Possible words include proper names and places.</li>
-                    <li>If it is a <em>hyphenated-word</em>, hyphens will not be shown.</li>
-                    <li>Diacritics (letter accents) are ignored - are not required for guessing, and will not be shown.</li>
+                    <li>
+                        <p>Possible words include proper names and places.</p>
+                    </li>
+                    <li>
+                        <p>If it is a <em>hyphenated-word</em>, hyphens will not be shown.</p>
+                    </li>
+                    <li>
+                        <p>Diacritics (letter accents) are ignored - are not required for guessing, and will not be shown.</p>
+                    </li>
                 </ol>
             </div>
             <br>
