@@ -18,7 +18,7 @@ const MAX_GUESSES = 14;
 const GAME_RESET = {
     guessesRemaining: MAX_GUESSES,
 
-    lettersGuessed_Str: "",
+    // lettersGuessed_Str: "",
     lettersGuessed_Obj: {
         A: false, B: false, C: false, D: false,
         E: false, F: false, G: false, H: false,
@@ -46,7 +46,7 @@ let gameVars = {
 let DOM_IDs = {
     word      : { el: null, gVar: "wordProgress"       },
     guessCount: { el: null, gVar: "guessesRemaining"   },
-    letters   : { el: null, gVar: "lettersGuessed_Str" },
+    letters   : { el: null, }, //gVar: "lettersGuessed_Str" },
     wins      : { el: null, gVar: "wins"               },
     help      : { el: null },
     instr     : { el: null },
@@ -130,11 +130,13 @@ function scoreWin() {
 function checkLetter(letter) {
     ((g) => { 
         let msg = "";
+        let correct = false;
+
         if (g.wordAnswer .indexOf(letter) < 0) {
             msg += letter + " is not in the word.";
             // trigger css
         } else { // letter is in the word 
-
+            correct = true;
             // Update the word display on screen
             for (let i = 0; i < g .wordAnswer .length; ++i) {
                 if (g.wordAnswer [i] === letter) {
@@ -154,12 +156,19 @@ function checkLetter(letter) {
             }
         }
 
+        // Add letter to guessed 
+        let colorLetter = document.createElement("li");
+        colorLetter.textContent = letter;
+        colorLetter.className = (correct ? "right-letter": "wrong-letter")
+        DOM_IDs.letters.el.appendChild(colorLetter);
+
         if (!g.endOfGame &&g.guessesRemaining === 0) {
             msg += " You have run out of guesses =[.  The word was " + g.wordAnswer;
             g.endOfGame = true;
         }
 
         showHelp(msg);
+
 
         if (g.endOfGame) {
             showInstr("Press " 
@@ -221,11 +230,11 @@ document.onkeyup = function (event) {
                 else { // New letter guessed
                     gameVars.guessesRemaining--;
                     gameVars.lettersGuessed_Obj[key] = true;
-                    gameVars.lettersGuessed_Str += key;
+                    // gameVars.lettersGuessed_Str += key;                    
 
                     checkLetter(key);
                 }
-                updateElements(DOM_IDs.guessCount, DOM_IDs.letters, DOM_IDs.word);
+                updateElements(DOM_IDs.guessCount, DOM_IDs.word); //, DOM_IDs.letters, ;
             }
         }
     }
