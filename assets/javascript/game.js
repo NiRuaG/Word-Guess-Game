@@ -97,7 +97,7 @@ function startNewGame() {
     // display word as "hidden" string
     gameVars.wordProgress = HIDE_CHAR.repeat(gameVars.wordAnswer.length);
 
-    showHelp("");
+    showHelp(); // hides 
     showInstr("Press letter keys to guess the word.");
     ////
 
@@ -108,13 +108,25 @@ function startNewGame() {
     );
 }
 
-function showHelp(msg) {
-    if (msg) {
-        DOM_IDs.help.el.style.visibility = 'visible';
-        DOM_IDs.help.el.textContent = msg;
+function showHelp(alertType, msgs) {
+    if (!alertType) {
+        DOM_IDs.help.el.style.visibility = 'hidden';
     }
     else {
-        DOM_IDs.help.el.style.visibility = 'hidden';
+        let alertEl = document.createElement("div");
+        alertEl.className = "w-100 alert " + alertType;
+        // console.log(alertEl);
+
+        msgs.forEach( (msg) => {
+            let msgP = document.createElement("p");
+            msgP.className = "m-0";
+            msgP.textContent = msg;
+            alertEl.appendChild(msgP);
+        });
+        console.log(alertEl);
+        DOM_IDs.help.el.replaceChild(alertEl, DOM_IDs.help.el.firstChild);
+        DOM_IDs.help.el.style.visibility = 'visible';
+        console.log(msgs);
     }
 }
 
@@ -129,12 +141,13 @@ function scoreWin() {
 
 function checkLetter(letter) {
     ((g) => { 
-        let msg = "";
+        let alertType = "";
+        let msgs = [];
         let correct = false;
 
         if (g.wordAnswer .indexOf(letter) < 0) {
-            msg += letter + " is not in the word.";
-            // trigger css
+            msgs.push(letter + " is not in the word.");
+            alertType = "alert-info";
         } else { // letter is in the word 
             correct = true;
             // Update the word display on screen
@@ -150,25 +163,26 @@ function checkLetter(letter) {
 
             // Check if completed 
             if (g.wordProgress === g.wordAnswer) {
-                msg += "You guessed the word!";
+                showHelp("alert-success", "You guessed the word!");
                 scoreWin();
                 g.endOfGame = true;
             }
         }
 
-        // Add letter to guessed 
+        // Add letter to guessed list
         let colorLetter = document.createElement("li");
         colorLetter.textContent = letter;
         colorLetter.className = (correct ? "right-letter": "wrong-letter")
         DOM_IDs.letters.el.appendChild(colorLetter);
 
-        if (!g.endOfGame &&g.guessesRemaining === 0) {
-            msg += " You have run out of guesses =[.  The word was " + g.wordAnswer;
+        if (!g.endOfGame && g.guessesRemaining === 0) {
+            msgs.push("You have run out of guesses =[.");
+            msgs.push("The word was " + g.wordAnswer);
+            alertType = "alert-danger";
             g.endOfGame = true;
         }
 
-        showHelp(msg);
-
+        showHelp(alertType, msgs);
 
         if (g.endOfGame) {
             showInstr("Press " 
@@ -224,7 +238,7 @@ document.onkeyup = function (event) {
 
             if (key.length === 1 && key >= 'A' && key <= 'Z') {
                 if (gameVars.lettersGuessed_Obj[key]) {
-                    showHelp("Letter " + key + " has already been guessed!");
+                    showHelp("alert-warning", "Letter " + key + " has already been guessed!");
                     /// TODO: css highlight 
                 }
                 else { // New letter guessed

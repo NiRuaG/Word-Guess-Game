@@ -27,12 +27,8 @@
             /* display: flex; */
             /* flex-direction: column; */
         }
-        .right-letter {
-            color: green;
-        }
-        .wrong-letter {
-            color: red;
-        }
+        .right-letter { color: green; }
+        .wrong-letter { color: red  ; }
         /* li {
             margin: 0;
         } */
@@ -51,7 +47,7 @@
 <body>
     <header class="jumbotron text-center">
         <h1>Word Guess Game</h1>
-        <span id="category" class="lead"><em class="font-special">Lord of the Rings</em> edition</span>
+        <span id="category" class="h2 font-italic font-special">Lord of the Rings</span> edition
     </header>
 
     <main class="container">
@@ -65,9 +61,9 @@
                 <p class="row m-0">Letters Guessed:</p>
                 <ul id="letters" class="row list-unstyled ml-3 mb-0"></ul>
                 <p class="row mx-0">Guesses Remaining: <span id="guessCount" class="ml-2"></span>/<span id="maxGuesses"></span></p>
-                <span id="help" class="row mx-0">Help</span>
+                <div class="row mx-0" id="help">Help</div>
             </div>
-            <!-- <div class="row"> -->
+
             <div class="col text-white">
                 <h5>Notes:</h5>
                 <ol>
