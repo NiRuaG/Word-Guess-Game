@@ -44,12 +44,15 @@ let gameVars = {
 // Global - Store DOM elements that get regularly altered
 // !! Important that object's keys are the same name as the HTML id=".."
 let DOM_IDs = {
-    word      : { el: null, gVar: "wordProgress"       },
-    guessCount: { el: null, gVar: "guessesRemaining"   },
-    letters   : { el: null, }, //gVar: "lettersGuessed_Str" },
-    wins      : { el: null, gVar: "wins"               },
-    help      : { el: null },
-    instr     : { el: null },
+    word       : { el: null, gVar: "wordProgress"       },
+    guessCount : { el: null, gVar: "guessesRemaining"   },
+    letters    : { el: null, }, //gVar: "lettersGuessed_Str" },
+    wins       : { el: null, gVar: "wins"               },
+    // help      : { el: null },
+    instr      : { el: null },
+    wordAlert  : { el: null },
+    letterAlertWrong: { el: null },
+    letterAlertRepeat: { el: null },
 };
 
 // FUNCTIONS
@@ -71,6 +74,8 @@ window.onload = function () {
         + " key to get started!");
     
     startGameSession();
+    console.log(gameVars.wordAnswer);
+    DOM_IDs.wordAlert.el.textContent = gameVars.wordAnswer;
 };
 
 let updateElements = (...args) => {
@@ -91,13 +96,14 @@ function startNewGame() {
         Math.floor(Math.random() * WORD_BANK.length)
     ].replace('-','') // removing hyphens, 
     .toUpperCase(); // word bank should already be ALL-CAPS, but just in case
-        
+    gameVars.wordAnswer = "FOEHAMMER";
+
     console.log("cheat: " + gameVars.wordAnswer);
         
     // display word as "hidden" string
     gameVars.wordProgress = HIDE_CHAR.repeat(gameVars.wordAnswer.length);
 
-    showHelp(); // hides 
+    // showHelp(); // hides 
     showInstr("Press letter keys to guess the word.");
     ////
 
@@ -108,27 +114,27 @@ function startNewGame() {
     );
 }
 
-function showHelp(alertType, msgs) {
-    if (!alertType) {
-        DOM_IDs.help.el.style.visibility = 'hidden';
-    }
-    else {
-        let alertEl = document.createElement("div");
-        alertEl.className = "w-100 alert " + alertType;
-        // console.log(alertEl);
+// function showHelp(alertType, msgs) {
+//     if (!alertType) {
+//         DOM_IDs.help.el.style.visibility = 'hidden';
+//     }
+//     else {
+//         let alertEl = document.createElement("div");
+//         alertEl.className = "w-100 alert " + alertType;
+//         // console.log(alertEl);
 
-        msgs.forEach( (msg) => {
-            let msgP = document.createElement("p");
-            msgP.className = "m-0";
-            msgP.textContent = msg;
-            alertEl.appendChild(msgP);
-        });
-        console.log(alertEl);
-        DOM_IDs.help.el.replaceChild(alertEl, DOM_IDs.help.el.firstChild);
-        DOM_IDs.help.el.style.visibility = 'visible';
-        console.log(msgs);
-    }
-}
+//         msgs.forEach( (msg) => {
+//             let msgP = document.createElement("p");
+//             msgP.className = "m-0";
+//             msgP.textContent = msg;
+//             alertEl.appendChild(msgP);
+//         });
+//         console.log(alertEl);
+//         DOM_IDs.help.el.replaceChild(alertEl, DOM_IDs.help.el.firstChild);
+//         DOM_IDs.help.el.style.visibility = 'visible';
+//         console.log(msgs);
+//     }
+// }
 
 function showInstr(msg) {
     DOM_IDs.instr.el.textContent = msg;
@@ -183,7 +189,7 @@ function checkLetter(letter) {
             g.endOfGame = true;
         }
 
-        showHelp(alertType, msgs);
+        // showHelp(alertType, msgs);
 
         if (g.endOfGame) {
             showInstr("Press " 
