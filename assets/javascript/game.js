@@ -10,8 +10,6 @@ const WORD_BANK = [
     "FELLOWSHIP", "MORDOR", "HOBBIT", "DWARF", "WIZARD", "ELVES", "WRAITHS", "RIDERS", "TROLL", "BALROGS", "SAURON", "BOROMIR", "SARUMAN", "ISENGARD", "ARAGORN", "LEGOLAS", "GIMLI", "ROHAN", "GANDALF", "TREEBEARD", "MERRY", "PIPPIN", "FRODO", "BAGGINS", "SAMWISE", "GOLLUM", "ELROND", "RIVENDELL", "ARWEN", "LOTHLORIEN", "PEREGRIN", "GLAMDRING", "STING", "GONDOLIN", "MORIA", "DWARROWDELF", "MIRKWOOD", "GONDOR", "SHIRE", "NAZGUL ", "RADAGAST", "ANDUIN", "GOBLIN", "SPIDER", "ORCRIST", "EOWYN", "FARAMIR", "GALADRIEL", "FOE-HAMMER", "KHAZAD-DUM",
 ];
 
-// const KEY_TO_START = "Enter";
-// const KEY_NEW_GAME = "Enter";
 const HIDE_CHAR = '_';
 
 const MAX_GUESSES = 14;
@@ -39,6 +37,7 @@ const GAME_RESET = {
 let gameVars = {
     wins: 0,
     sessionStarted: false,
+    cheating: false,
 };
 
 // Global - Store DOM elements that get regularly altered
@@ -56,6 +55,7 @@ let DOM_IDs = {
     letterAlertWrongChar : { el: null, },
     letterAlertRepeat    : { el: null, },
     letterAlertRepeatChar: { el: null, },
+    maxGuesses           : { el: null, },
     guessesAlert         : { el: null, },
 };
 
@@ -69,24 +69,22 @@ let Alerts = {
 
 // FUNCTIONS
 window.onload = function () {
-    console.log("--- ON LOAD ---");
-
-    // One-off DOM elements
-    document.getElementById("maxGuesses").textContent = MAX_GUESSES;
+    // console.log("--- ON LOAD ---");
+    console.log("For testing purposes, press Shift + _  (underscore) to toggle showing the answer.");
     
     // Link up the variables to their DOM elements 
     Object.entries(DOM_IDs).forEach( ([k,v]) => {
         v.el = document.getElementById(k);
     });
 
+    // One-off 'static' DOM elements
+    DOM_IDs.maxGuesses.el.textContent = MAX_GUESSES;
+
     showInstr("Press " 
         + ((typeof KEY_TO_START === "string") ?
             "[" + KEY_TO_START + "]"
             : "any")
-        + " key to get started!");
-    
-    startGameSession();
-    console.log(gameVars.wordAnswer);
+        + " key to get started!");    
 };
 
 let updateElements = (...args) => {
@@ -96,7 +94,7 @@ let updateElements = (...args) => {
 };
 
 function startNewGame() {
-    console.log("--- STARTING NEW GAME ---");
+    // console.log("--- STARTING NEW GAME ---");
 
     //// Set Game Variables
     // deep copy the reset object, but keep our own 'live' variables (eg wins)
@@ -107,10 +105,9 @@ function startNewGame() {
         Math.floor(Math.random() * WORD_BANK.length)
     ].replace('-','') // removing hyphens, 
     .toUpperCase(); // word bank should already be ALL-CAPS, but just in case
-    gameVars.wordAnswer = "FOEHAMMER";
 
-    console.log("cheat: " + gameVars.wordAnswer);
-        
+    if (gameVars.cheating) { showAnswer(); }
+
     // display word as "hidden" string
     gameVars.wordProgress = HIDE_CHAR.repeat(gameVars.wordAnswer.length);
 
@@ -137,28 +134,6 @@ let showAlert = (alertID, extra) => {
         alertID.extra.el.textContent = extra;
 };
 
-// function showHelp(alertType, msgs) {
-//     if (!alertType) {
-//         DOM_IDs.help.el.style.visibility = 'hidden';
-//     }
-//     else {
-//         let alertEl = document.createElement("div");
-//         alertEl.className = "w-100 alert " + alertType;
-//         // console.log(alertEl);
-
-//         msgs.forEach( (msg) => {
-//             let msgP = document.createElement("p");
-//             msgP.className = "m-0";
-//             msgP.textContent = msg;
-//             alertEl.appendChild(msgP);
-//         });
-//         console.log(alertEl);
-//         DOM_IDs.help.el.replaceChild(alertEl, DOM_IDs.help.el.firstChild);
-//         DOM_IDs.help.el.style.visibility = 'visible';
-//         console.log(msgs);
-//     }
-// }
-
 function showInstr(msg) {
     DOM_IDs.instr.el.textContent = msg;
 }
@@ -170,8 +145,6 @@ function scoreWin() {
 
 function checkLetter(letter) {
     ((g) => { 
-        let alertType = "";
-        let msgs = [];
         let correct = false;
 
         if (g.wordAnswer .indexOf(letter) < 0) {
@@ -203,12 +176,14 @@ function checkLetter(letter) {
         colorLetter.className = (correct ? "right-letter": "wrong-letter")
         DOM_IDs.letters.el.appendChild(colorLetter);
 
+        // check if ran out of guesses
         if (!g.endOfGame && g.guessesRemaining === 0) {
             showAlert(Alerts.guesses);
             showAlert(Alerts.word, g.wordAnswer);
             g.endOfGame = true;
         }
 
+        // show new game instructions
         if (g.endOfGame) {
             showInstr("Press " 
                 + ((typeof KEY_NEW_GAME === "string") ?
@@ -228,24 +203,43 @@ function checkLetter(letter) {
 // }
 
 function startGameSession() {
-    console.log("--- STARTING SESSION ---");
+    // console.log("--- STARTING SESSION ---");
 
     gameVars.sessionStarted = true;
-    // document.getElementById("instr" ).style.visibility = "hidden";
     document.getElementById("gameUI").style.visibility = "visible";
     
     startNewGame();
     updateElements(DOM_IDs.wins); 
 }
 
-// let eventsByKey = {
-//     // KEY_TO_START: once(startGameSession),
-//     // KEY_NEW_GAME: startNewGame          ,
-// };
+function endRound() {
+    showAlert(Alerts.word, gameVars.wordAnswer);
+    showInstr("Press " 
+                + ((typeof KEY_NEW_GAME === "string") ?
+                    "[" + KEY_NEW_GAME + "]"
+                    : "any")
+                + " key to start a new game!")
+    gameVars.endOfGame = true;
+}
+
+function showAnswer() {
+    console.log("Cheat: " + gameVars.wordAnswer);
+}
+
+function toggleCheat() {
+    gameVars.cheating = !gameVars.cheating;
+    console.log("Cheating " + (gameVars.cheating ? "on." : "off."));
+    if (gameVars.cheating) { showAnswer(); }
+}
+
+let eventsByKey = {
+    Escape: endRound,
+    _ : toggleCheat,
+};
 
 document.onkeyup = function (event) {
     let key = event.key;
-    console.log(key);
+    // console.log(key);
 
     if (!gameVars.sessionStarted) {
         // once(startGameSession);
@@ -255,25 +249,26 @@ document.onkeyup = function (event) {
         startNewGame();
     }
     else {
-        // if (eventsByKey.hasOwnProperty(key)) {
-        //     eventsByKey[key]();
-        // } else {
-        hideAlerts();
-        if (!gameVars.endOfGame) {
-            key = key.toUpperCase();
+        if (eventsByKey.hasOwnProperty(key)) {
+            eventsByKey[key]();
+        } else {
+            hideAlerts();
+            if (!gameVars.endOfGame) {
+                key = key.toUpperCase();
 
-            if (key.length === 1 && key >= 'A' && key <= 'Z') {
-                if (gameVars.lettersGuessed_Obj[key]) {
-                    showAlert(Alerts.letterRepeat, key);
-                }
-                else { // New letter guessed
-                    gameVars.guessesRemaining--;
-                    gameVars.lettersGuessed_Obj[key] = true;
-                    // gameVars.lettersGuessed_Str += key;                    
+                if (key.length === 1 && key >= 'A' && key <= 'Z') {
+                    if (gameVars.lettersGuessed_Obj[key]) {
+                        showAlert(Alerts.letterRepeat, key);
+                    }
+                    else { // New letter guessed
+                        gameVars.guessesRemaining--;
+                        gameVars.lettersGuessed_Obj[key] = true;
+                        // gameVars.lettersGuessed_Str += key;                    
 
-                    checkLetter(key);
+                        checkLetter(key);
+                    }
+                    updateElements(DOM_IDs.guessCount, DOM_IDs.word); //, DOM_IDs.letters, ;
                 }
-                updateElements(DOM_IDs.guessCount, DOM_IDs.word); //, DOM_IDs.letters, ;
             }
         }
     }
