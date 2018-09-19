@@ -1,5 +1,6 @@
 # Word-Guess-Game
 Word Guess Game for Bootcamp
+_**Hosted as a GitHub Page at https://niruag.github.io/Word-Guess-Game/**_
 
 ## **Try to complete the word before you run out of guesses!** ##
 
