@@ -44,15 +44,27 @@ let gameVars = {
 // Global - Store DOM elements that get regularly altered
 // !! Important that object's keys are the same name as the HTML id=".."
 let DOM_IDs = {
-    word       : { el: null, gVar: "wordProgress"       },
-    guessCount : { el: null, gVar: "guessesRemaining"   },
-    letters    : { el: null, }, //gVar: "lettersGuessed_Str" },
-    wins       : { el: null, gVar: "wins"               },
-    // help      : { el: null },
-    instr      : { el: null },
-    wordAlert  : { el: null },
-    letterAlertWrong: { el: null },
-    letterAlertRepeat: { el: null },
+    word                 : { el: null, gVar: "wordProgress"       },
+    guessCount           : { el: null, gVar: "guessesRemaining"   },
+    letters              : { el: null, }, //gVar: "lettersGuessed_Str" },
+    wins                 : { el: null, gVar: "wins"               },
+    instr                : { el: null, },
+    winAlert             : { el: null, },
+    wordAlert            : { el: null, },
+    wordAlertAnswer      : { el: null, },
+    letterAlertWrong     : { el: null, },
+    letterAlertWrongChar : { el: null, },
+    letterAlertRepeat    : { el: null, },
+    letterAlertRepeatChar: { el: null, },
+    guessesAlert         : { el: null, },
+};
+
+let Alerts = {
+    win          : { dom: DOM_IDs.winAlert         ,                                      },
+    word         : { dom: DOM_IDs.wordAlert        , extra: DOM_IDs.wordAlertAnswer       },
+    letterWrong  : { dom: DOM_IDs.letterAlertWrong , extra: DOM_IDs.letterAlertWrongChar  },
+    letterRepeat : { dom: DOM_IDs.letterAlertRepeat, extra: DOM_IDs.letterAlertRepeatChar },
+    guesses      : { dom: DOM_IDs.guessesAlert     ,                                      },
 };
 
 // FUNCTIONS
@@ -75,7 +87,6 @@ window.onload = function () {
     
     startGameSession();
     console.log(gameVars.wordAnswer);
-    DOM_IDs.wordAlert.el.textContent = gameVars.wordAnswer;
 };
 
 let updateElements = (...args) => {
@@ -103,7 +114,7 @@ function startNewGame() {
     // display word as "hidden" string
     gameVars.wordProgress = HIDE_CHAR.repeat(gameVars.wordAnswer.length);
 
-    // showHelp(); // hides 
+    hideAlerts();
     showInstr("Press letter keys to guess the word.");
     ////
 
@@ -113,6 +124,18 @@ function startNewGame() {
         DOM_IDs.letters   ,
     );
 }
+
+let hideAlerts = () => {
+    Object.values(Alerts).forEach( (v) => {
+        v.dom.el.style.visibility = "hidden"
+    });
+};
+
+let showAlert = (alertID, extra) => {
+    alertID.dom.el.style.visibility = "visible";
+    if (extra)
+        alertID.extra.el.textContent = extra;
+};
 
 // function showHelp(alertType, msgs) {
 //     if (!alertType) {
@@ -152,8 +175,7 @@ function checkLetter(letter) {
         let correct = false;
 
         if (g.wordAnswer .indexOf(letter) < 0) {
-            msgs.push(letter + " is not in the word.");
-            alertType = "alert-info";
+            showAlert(Alerts.letterWrong, letter);
         } else { // letter is in the word 
             correct = true;
             // Update the word display on screen
@@ -169,8 +191,7 @@ function checkLetter(letter) {
 
             // Check if completed 
             if (g.wordProgress === g.wordAnswer) {
-                alertType = "alert-success";
-                msgs.push("You guessed the word!");
+                showAlert(Alerts.win);
                 scoreWin();
                 g.endOfGame = true;
             }
@@ -183,13 +204,10 @@ function checkLetter(letter) {
         DOM_IDs.letters.el.appendChild(colorLetter);
 
         if (!g.endOfGame && g.guessesRemaining === 0) {
-            msgs.push("You have run out of guesses =[.");
-            msgs.push("The word was " + g.wordAnswer);
-            alertType = "alert-danger";
+            showAlert(Alerts.guesses);
+            showAlert(Alerts.word, g.wordAnswer);
             g.endOfGame = true;
         }
-
-        // showHelp(alertType, msgs);
 
         if (g.endOfGame) {
             showInstr("Press " 
@@ -239,14 +257,14 @@ document.onkeyup = function (event) {
     else {
         // if (eventsByKey.hasOwnProperty(key)) {
         //     eventsByKey[key]();
-        // } else 
+        // } else {
+        hideAlerts();
         if (!gameVars.endOfGame) {
             key = key.toUpperCase();
 
             if (key.length === 1 && key >= 'A' && key <= 'Z') {
                 if (gameVars.lettersGuessed_Obj[key]) {
-                    showHelp("alert-warning", ["Letter " + key + " has already been guessed!"]);
-                    /// TODO: css highlight 
+                    showAlert(Alerts.letterRepeat, key);
                 }
                 else { // New letter guessed
                     gameVars.guessesRemaining--;
