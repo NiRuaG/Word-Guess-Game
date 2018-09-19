@@ -134,23 +134,24 @@ let showAlert = (alertID, extra) => {
         alertID.extra.el.textContent = extra;
 };
 
-function showInstr(msg) {
+let showInstr = (msg) => {
     DOM_IDs.instr.el.textContent = msg;
-}
+};
 
-function scoreWin() {
+let scoreWin = () => {
     ++gameVars.wins;
     updateElements(DOM_IDs.wins);
-}
+};
 
 function checkLetter(letter) {
+    // console.log("--- CHECKING LETTER ---");
     ((g) => { 
-        let correct = false;
+        // correct: is letter in word?
+        let correct = (g.wordAnswer.indexOf(letter) >= 0);
 
-        if (g.wordAnswer .indexOf(letter) < 0) {
+        if (!correct) { 
             showAlert(Alerts.letterWrong, letter);
-        } else { // letter is in the word 
-            correct = true;
+        } else { // letter IS in the word 
             // Update the word display on screen
             for (let i = 0; i < g .wordAnswer .length; ++i) {
                 if (g.wordAnswer [i] === letter) {
@@ -162,7 +163,7 @@ function checkLetter(letter) {
                 }
             }
 
-            // Check if completed 
+            // Check if word is completed 
             if (g.wordProgress === g.wordAnswer) {
                 showAlert(Alerts.win);
                 scoreWin();
@@ -176,7 +177,8 @@ function checkLetter(letter) {
         colorLetter.className = (correct ? "right-letter": "wrong-letter")
         DOM_IDs.letters.el.appendChild(colorLetter);
 
-        // check if ran out of guesses
+        
+        // otherwise check if now out of guesses, and that game isn't over (having already won)
         if (!g.endOfGame && g.guessesRemaining === 0) {
             showAlert(Alerts.guesses);
             showAlert(Alerts.word, g.wordAnswer);
@@ -190,7 +192,7 @@ function checkLetter(letter) {
                     "[" + KEY_NEW_GAME + "]"
                     : "any")
                 + " key to start a new game!")
-        }
+        }       
     })(gameVars);
 }
 
@@ -213,7 +215,10 @@ function startGameSession() {
 }
 
 function endRound() {
+    // console.log("--- ENDING ROUND ---");
     showAlert(Alerts.word, gameVars.wordAnswer);
+
+    // show new game instructions
     showInstr("Press " 
                 + ((typeof KEY_NEW_GAME === "string") ?
                     "[" + KEY_NEW_GAME + "]"
@@ -222,54 +227,55 @@ function endRound() {
     gameVars.endOfGame = true;
 }
 
-function showAnswer() {
+let showAnswer = () => {
     console.log("Cheat: " + gameVars.wordAnswer);
-}
+};
 
-function toggleCheat() {
+let toggleCheat = () => {
     gameVars.cheating = !gameVars.cheating;
     console.log("Cheating " + (gameVars.cheating ? "on." : "off."));
     if (gameVars.cheating) { showAnswer(); }
-}
+};
 
 let eventsByKey = {
     Escape: endRound,
-    _ : toggleCheat,
+    _     : toggleCheat,
 };
 
 document.onkeyup = function (event) {
+    // console.log("--- KEY EVENT ---");
     let key = event.key;
     // console.log(key);
 
+    // any key to start game session
     if (!gameVars.sessionStarted) {
         // once(startGameSession);
         startGameSession();
     }
+    // any key to start new game (if at end of game)
     else if (gameVars.endOfGame) {
         startNewGame();
     }
+    // special 'event' keys
+    else if (eventsByKey.hasOwnProperty(key)) {
+         eventsByKey[key]();
+    }
     else {
-        if (eventsByKey.hasOwnProperty(key)) {
-            eventsByKey[key]();
-        } else {
+        key = key.toUpperCase();
+
+        if (key.length === 1 && key >= 'A' && key <= 'Z') {
             hideAlerts();
-            if (!gameVars.endOfGame) {
-                key = key.toUpperCase();
 
-                if (key.length === 1 && key >= 'A' && key <= 'Z') {
-                    if (gameVars.lettersGuessed_Obj[key]) {
-                        showAlert(Alerts.letterRepeat, key);
-                    }
-                    else { // New letter guessed
-                        gameVars.guessesRemaining--;
-                        gameVars.lettersGuessed_Obj[key] = true;
-                        // gameVars.lettersGuessed_Str += key;                    
-
-                        checkLetter(key);
-                    }
-                    updateElements(DOM_IDs.guessCount, DOM_IDs.word); //, DOM_IDs.letters, ;
-                }
+            if (gameVars.lettersGuessed_Obj[key]) { // repeat letter, already guessed
+                showAlert(Alerts.letterRepeat, key);
             }
+            else { // New letter guessed
+                gameVars.guessesRemaining--;
+                gameVars.lettersGuessed_Obj[key] = true;
+
+                checkLetter(key);
+            }
+            updateElements(DOM_IDs.guessCount, DOM_IDs.word);
         }
     }
 };
