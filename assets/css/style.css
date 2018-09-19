@@ -1,0 +1,33 @@
+/* LotR Font */
+@font-face {
+    font-family: 'RingbearerMedium';
+    src: 
+        url('./../fonts/RingbearerMedium.eot?#iefix') format('embedded-opentype'), 
+        url('./../fonts/RingbearerMedium.woff') format('woff'), 
+        url('./../fonts/RingbearerMedium.ttf') format('truetype'), 
+        url('./../fonts/RingbearerMedium.svg#RingbearerMedium') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.font-special {
+    font-family: 'RingbearerMedium';
+}
+
+body {
+    min-height: 100vh;
+}
+
+.right-letter { color: green; }
+.wrong-letter { color: red  ; }
+
+#letters {
+    min-height: 2rem;
+}
+
+#word,
+#letters {
+    letter-spacing: 1rem;
+    font-family: 'RingbearerMedium', 'PT Mono','Courier New', Courier, monospace;
+    font-weight: bolder;
+}
