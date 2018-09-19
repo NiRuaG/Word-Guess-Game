@@ -56,53 +56,62 @@
     </header>
 
     <main class="container">
-        <span id="instr" class="row mx-auto mb-3"></span>
+        <p><span id="instr" class="row mx-auto"></span></p>
+        <div id="gameUI" id="gameUI" style="visibility: hidden">
     
-        <div class="row bg-primary p-1" id="gameUI" style="visibility: hidden">
-            <div class="col-12 col-sm-8 bg-light py-2 px-0 px-md-2 m-0 my-auto h-100">
-                <div class="row p-0 m-0 mb-1">
-                    <p class="col m-0 ml-1 p-0">Wins: <span id="wins" class="m-0 p-0"></span></p>
-                    <div id="winAlert" class="col-12 col-md-5 alert alert-success text-center m-0 py-1">You guessed the word!</div>
-                </div>
-                <div class="row p-0 m-0 mb-1">
-                    <div class="col p-0 m-0">
-                        <p class="row m-0 ml-1 p-0">Word:</p>
-                        <span id="word" class="row ml-4 mr-0 my-2 p-0"></span>
+            <p><kbd>Escape</kbd> to end the round.</p>
+    
+            <div class="row bg-primary p-1">
+                <div class="col-12 col-sm-8 bg-light py-2 px-0 px-md-2 m-0 my-auto h-100">
+                    <div class="row p-0 m-0 mb-1">
+                        <p class="col m-0 ml-1 p-0">Wins: <span id="wins" class="m-0 p-0"></span></p>
+                        <div id="winAlert" class="col-12 col-md-5 alert alert-success text-center m-0 py-1">You guessed the
+                            word!</div>
                     </div>
-                    <div id="wordAlert" class="col-12 col-md-5 alert text-center m-0 alert-info py-1 align-self-center">The word was <span id="wordAlertAnswer"></span></div>
-                </div>
-                <div class="row p-0 m-0 mb-1">
-                    <div class="col p-0 m-0">
-                        <p class="row m-0 ml-1 p-0">Letters Guessed:</p>
-                        <ul id="letters" class="row list-unstyled mr-0 ml-4 my-2 p-0"></ul>
+                    <div class="row p-0 m-0 mb-1">
+                        <div class="col p-0 m-0">
+                            <p class="row m-0 ml-1 p-0">Word:</p>
+                            <span id="word" class="row ml-4 mr-0 my-2 p-0"></span>
+                        </div>
+                        <div id="wordAlert" class="col-12 col-md-5 alert text-center m-0 alert-info py-1 align-self-center">The
+                            word was <span id="wordAlertAnswer"></span></div>
                     </div>
-                    <div class="col-12 col-md-5 m-0 p-0 align-self-center">
-                        <p id="letterAlertWrong" class="row alert text-center m-0 py-1 alert-warning"><span id="letterAlertWrongChar" class="mr-1"></span> is not in the word.</p>
-                        <p id="letterAlertRepeat" class="row alert text-center m-0 py-1 alert-warning "><span id="letterAlertRepeatChar" class="mr-1"></span> has already been guessed.</p>
+                    <div class="row p-0 m-0 mb-1">
+                        <div class="col p-0 m-0">
+                            <p class="row m-0 ml-1 p-0">Letters Guessed:</p>
+                            <ul id="letters" class="row list-unstyled mr-0 ml-4 my-2 p-0"></ul>
+                        </div>
+                        <div class="col-12 col-md-5 m-0 p-0 align-self-center">
+                            <p id="letterAlertWrong" class="row alert text-center m-0 py-1 alert-warning"><span id="letterAlertWrongChar"
+                                    class="mr-1"></span> is not in the word.</p>
+                            <p id="letterAlertRepeat" class="row alert text-center m-0 py-1 alert-warning "><span id="letterAlertRepeatChar"
+                                    class="mr-1"></span> has already been guessed.</p>
+                        </div>
                     </div>
+                    <div class="row p-0 m-0 mb-1">
+                        <p class="col m-0 ml-1 p-0">Guesses Remaining: <span id="guessCount" class="ml-2"></span> /<span id="maxGuesses"></span></p>
+                        <div id="guessesAlert" class="col-12 col-md-5 text-center m-0 alert alert-danger py-1">You have run
+                            out of guesses =[.</div>
+                    </div>
+                    <!-- <div class="row mx-0" id="help">Help</div> -->
                 </div>
-                <div class="row p-0 m-0 mb-1">
-                    <p class="col m-0 ml-1 p-0">Guesses Remaining: <span id="guessCount" class="ml-2"></span> /<span id="maxGuesses"></span></p>
-                    <div id="guessesAlert" class="col-12 col-md-5 text-center m-0 alert alert-danger py-1">You have run out of guesses =[.</div>
+    
+                <div class="col text-white">
+                    <h5>Notes:</h5>
+                    <ol class="mb-0">
+                        <li>
+                            <p>Possible words include proper names and places.</p>
+                        </li>
+                        <li>
+                            <p>If it is a <em>hyphenated-word</em>, hyphens will not be shown.</p>
+                        </li>
+                        <li>
+                            <p class="mb-0">Diacritics (letter accents) are ignored - not required to guess and not shown.</p>
+                        </li>
+                    </ol>
                 </div>
-                <!-- <div class="row mx-0" id="help">Help</div> -->
+                <br>
             </div>
-
-            <div class="col text-white">
-                <h5>Notes:</h5>
-                <ol class="mb-0">
-                    <li>
-                        <p>Possible words include proper names and places.</p>
-                    </li>
-                    <li>
-                        <p>If it is a <em>hyphenated-word</em>, hyphens will not be shown.</p>
-                    </li>
-                    <li>
-                        <p class="mb-0">Diacritics (letter accents) are ignored - not required to guess and not shown.</p>
-                    </li>
-                </ol>
-            </div>
-            <br>
         </div>
     </main>
 
