@@ -6,7 +6,7 @@
 //   Hyphens will be removed from the words by the code. They are left in this array incase of future versions & options
 //   Diacritics have been removed from this array, and would need editing to restore them. 
 const WORD_BANK = [
-    "FELLOWSHIP", "MORDOR", "HOBBIT", "DWARF", "WIZARD", "ELVES", "WRAITHS", "RIDERS", "TROLL", "BALROGS", "SAURON", "BOROMIR", "SARUMAN", "ISENGARD", "ARAGORN", "LEGOLAS", "GIMLI", "ROHAN", "GANDALF", "TREEBEARD", "MERRY", "PIPPIN", "FRODO", "BAGGINS", "SAMWISE", "GOLLUM", "ELROND", "RIVENDELL", "ARWEN", "LOTHLORIEN", "PEREGRIN", "GLAMDRING", "STING", "GONDOLIN", "MORIA", "DWARROWDELF", "MIRKWOOD", "GONDOR", "SHIRE", "NAZGUL ", "RADAGAST", "ANDUIN", "GOBLIN", "SPIDER", "ORCRIST", "EOWYN", "FARAMIR", "GALADRIEL", "FOE-HAMMER", "KHAZAD-DUM",
+    "FELLOWSHIP", "MORDOR", "HOBBIT", "DWARF", "WIZARD", "ELVES", "WRAITHS", "RIDERS", "TROLL", "BALROGS", "SAURON", "BOROMIR", "SARUMAN", "ISENGARD", "ARAGORN", "LEGOLAS", "GIMLI", "ROHAN", "GANDALF", "TREEBEARD", "MERRY", "PIPPIN", "FRODO", "BAGGINS", "SAMWISE", "GOLLUM", "ELROND", "RIVENDELL", "ARWEN", "LOTHLORIEN", "PEREGRIN", "GLAMDRING", "STING", "GONDOLIN", "MORIA", "DWARROWDELF", "MIRKWOOD", "GONDOR", "SHIRE", "NAZGUL", "RADAGAST", "ANDUIN", "GOBLIN", "SPIDER", "ORCRIST", "EOWYN", "FARAMIR", "GALADRIEL", "FOE-HAMMER", "KHAZAD-DUM",
 ];
 
 const HIDE_CHAR = '_';  // character to display for the hidden letters display
