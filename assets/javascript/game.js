@@ -6,7 +6,7 @@
 //   Hyphens will be removed from the words by the code. They are left in this array incase of future versions & options
 //   Diacritics have been removed from this array, and would need editing to restore them. 
 const WORD_BANK = [
-    "FELLOWSHIP", "MORDOR", "HOBBIT", "DWARF", "WIZARD", "ELVES", "WRAITHS", "RIDERS", "TROLL", "BALROGS", "SAURON", "BOROMIR", "SARUMAN", "ISENGARD", "ARAGORN", "LEGOLAS", "GIMLI", "ROHAN", "GANDALF", "TREEBEARD", "MERRY", "PIPPIN", "FRODO", "BAGGINS", "SAMWISE", "GOLLUM", "ELROND", "RIVENDELL", "ARWEN", "LOTHLORIEN", "PEREGRIN", "GLAMDRING", "STING", "GONDOLIN", "MORIA", "DWARROWDELF", "MIRKWOOD", "GONDOR", "SHIRE", "NAZGUL ", "RADAGAST", "ANDUIN", "GOBLIN", "SPIDER", "ORCRIST", "EOWYN", "FARAMIR", "GALADRIEL", "FOE-HAMMER", "KHAZAD-DUM",
+    "FELLOWSHIP", "MORDOR", "HOBBIT", "DWARF", "WIZARD", "ELVES", "WRAITHS", "RIDERS", "TROLL", "BALROGS", "SAURON", "BOROMIR", "SARUMAN", "ISENGARD", "ARAGORN", "LEGOLAS", "GIMLI", "ROHAN", "GANDALF", "TREEBEARD", "MERRY", "PIPPIN", "FRODO", "BAGGINS", "SAMWISE", "GOLLUM", "ELROND", "RIVENDELL", "ARWEN", "LOTHLORIEN", "PEREGRIN", "GLAMDRING", "STING", "GONDOLIN", "MORIA", "DWARROWDELF", "MIRKWOOD", "GONDOR", "SHIRE", "NAZGUL", "RADAGAST", "ANDUIN", "GOBLIN", "SPIDER", "ORCRIST", "EOWYN", "FARAMIR", "GALADRIEL", "FOE-HAMMER", "KHAZAD-DUM",
 ];
 
 const HIDE_CHAR = '_';  // character to display for the hidden letters display
@@ -15,7 +15,6 @@ const MAX_GUESSES = 14;
 const GAME_RESET = {
     guessesRemaining: MAX_GUESSES,
 
-    // lettersGuessed_Str: "",
     lettersGuessed_Obj: {
         A: false, B: false, C: false, D: false,
         E: false, F: false, G: false, H: false,
@@ -87,7 +86,7 @@ window.onload = function () {
         + ((typeof KEY_TO_START === "string") ?
             "[" + KEY_TO_START + "]"
             : "any")
-        + " key to get started!");    
+        + " key to get started!");
 };
 
 let updateElements = (...args) => {
@@ -157,7 +156,7 @@ function checkLetter(letter) {
         } else { // letter IS in the word 
             // Update the word progress on screen
             for (let i = 0; i < g .wordAnswer .length; ++i) {
-                if (g.wordAnswer [i] === letter) {
+                if (g.wordAnswer[i] === letter) {
                     g.wordProgress =
                         g.wordProgress.substring(0, i)
                         + letter
@@ -165,6 +164,7 @@ function checkLetter(letter) {
                     // console.log(i,letter,g.wordProgress)
                 }
             }
+            updateElements(DOM_IDs.word);
         }
 
         // correct (green) or not (red), add guessed letter to list
@@ -194,18 +194,11 @@ function startGameSession() {
     updateElements(DOM_IDs.wins); 
 }
 
-function endRound() {
+let endRound = () => {
     // console.log("--- ENDING ROUND ---");
     showAlert(Alerts.word, gameVars.wordAnswer);
-
-    // show new game instructions
-    showInstr("Press " 
-                + ((typeof KEY_NEW_GAME === "string") ?
-                    "[" + KEY_NEW_GAME + "]"
-                    : "any")
-                + " key to start a new game!")
     gameVars.endOfGame = true;
-}
+};
 
 let showAnswer = () => {
     console.log("Cheat: " + gameVars.wordAnswer);
@@ -256,7 +249,6 @@ document.onkeyup = function (event) {
                 gameVars.lettersGuessed_Obj[key] = true;
 
                 checkLetter(key);
-                updateElements(DOM_IDs.word);
 
                 // Check if word is now completed (WIN)
                 if (gameVars.wordProgress === gameVars.wordAnswer) {
@@ -270,18 +262,18 @@ document.onkeyup = function (event) {
                     showAlert(Alerts.word, gameVars.wordAnswer);
                     gameVars.endOfGame = true;
                 }
-
-                // if at end of game for either reason (WIN/LOSS), show instructions for new game
-                if (gameVars.endOfGame) {
-                    showInstr(
-                        "Press " +
-                        (typeof KEY_NEW_GAME === "string"
-                            ? "[" + KEY_NEW_GAME + "]"
-                            : "any") +
-                        " key to start a new game!"
-                    );
-                }
             }
         }
+    }
+
+    // if at end of game for any reason (WIN/LOSS/forced End), show instructions for new game
+    if (gameVars.endOfGame) {
+        showInstr(
+            "Press " +
+            (typeof KEY_NEW_GAME === "string"
+                ? "[" + KEY_NEW_GAME + "]"
+                : "any") +
+            " key to start a new game!"
+        );
     }
 };
